@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class PostController extends ThreadRelatedHelper {
+public class PostController extends ThreadHelper {
     @Autowired
     PostDAO postDAO;
     @Autowired

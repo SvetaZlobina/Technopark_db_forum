@@ -9,7 +9,7 @@ import api.models.Thread;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class ThreadRelatedHelper {
+public abstract class ThreadHelper {
     @Autowired
     protected ThreadDAO threadDAO;
     private static final String GET_THREAD_BY_ID = "getThreadById";
