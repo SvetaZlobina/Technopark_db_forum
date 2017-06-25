@@ -9,18 +9,20 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 
 
-public class PostPage implements JsonConvertible {
+public class PostPageModel implements JsonConvertible {
+
     private static final ObjectMapper mapper = new ObjectMapper()
             .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 
-    List<Post> posts;
-    String marker;
+    private List<PostModel> postModels;
+    private String marker;
 
     @Override
     public ObjectNode toJsonNode() {
+
         final ArrayNode arrayJsonNode = mapper.createArrayNode();
-        for (int i = 0; i != posts.size(); ++i) {
-            arrayJsonNode.add(mapper.convertValue(posts.get(i), JsonNode.class));
+        for (int i = 0; i != postModels.size(); ++i) {
+            arrayJsonNode.add(mapper.convertValue(postModels.get(i), JsonNode.class));
         }
 
         final ObjectNode jsonNode = mapper.createObjectNode();
@@ -30,8 +32,9 @@ public class PostPage implements JsonConvertible {
         return jsonNode;
     }
 
-    public PostPage(List<Post> postList, String marker) {
+    public PostPageModel(final List<PostModel> postModelList,
+                         final String marker) {
         this.marker = marker;
-        this.posts = postList;
+        this.postModels = postModelList;
     }
 }

@@ -1,17 +1,17 @@
 package api.models;
 
 
-public class Vote {
-    public enum VoteStatus {VOTE, UNVOTE}
+public class VoteModel {
+    public enum VoteState {VOTE, UNVOTE}
 
     private String nickname;
     private Integer voice;
 
-    public VoteStatus getStatus() {
+    public VoteState getStatus() {
         if (voice.equals(1)) {
-            return VoteStatus.VOTE;
+            return VoteState.VOTE;
         } else {
-            return VoteStatus.UNVOTE;
+            return VoteState.UNVOTE;
         }
     }
 

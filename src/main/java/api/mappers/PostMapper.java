@@ -1,25 +1,25 @@
 package api.mappers;
 
+import api.models.PostModel;
 import org.springframework.jdbc.core.RowMapper;
-import api.models.Post;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
-public class PostMapper implements RowMapper<Post> {
+public class PostMapper implements RowMapper<PostModel> {
     @Override
-    public Post mapRow(ResultSet resultSet, int i) throws SQLException {
-        final Post post = new Post();
-        post.setThread(resultSet.getInt("thread"));
-        post.setForum(resultSet.getString("forum"));
-        post.setAuthor(resultSet.getString("author"));
-        post.setCreated(resultSet.getTimestamp("created"));
-        post.setIsEdited(resultSet.getBoolean("isEdited"));
-        post.setId(resultSet.getInt("id"));
-        post.setMessage(resultSet.getString("message"));
-        post.setParent(resultSet.getInt("parent"));
+    public PostModel mapRow(ResultSet resultSet, int i) throws SQLException {
+        final PostModel postModel = new PostModel();
+        postModel.setThread(resultSet.getInt("thread"));
+        postModel.setForum(resultSet.getString("forum"));
+        postModel.setAuthor(resultSet.getString("author"));
+        postModel.setCreated(resultSet.getTimestamp("created"));
+        postModel.setIsEdited(resultSet.getBoolean("isEdited"));
+        postModel.setId(resultSet.getInt("id"));
+        postModel.setMessage(resultSet.getString("message"));
+        postModel.setParent(resultSet.getInt("parent"));
 
-        return post;
+        return postModel;
     }
 }

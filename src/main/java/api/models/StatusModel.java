@@ -1,6 +1,7 @@
 package api.models;
 
-public class Status {
+public class StatusModel {
+
     private Integer post;
     private Integer thread;
     private Integer forum;
@@ -10,7 +11,7 @@ public class Status {
         return post;
     }
 
-    public void setPost(Integer post) {
+    public void setPost(final Integer post) {
         this.post = post;
     }
 
@@ -18,7 +19,7 @@ public class Status {
         return thread;
     }
 
-    public void setThread(Integer thread) {
+    public void setThread(final Integer thread) {
         this.thread = thread;
     }
 
@@ -26,7 +27,7 @@ public class Status {
         return forum;
     }
 
-    public void setForum(Integer forum) {
+    public void setForum(final Integer forum) {
         this.forum = forum;
     }
 
@@ -34,7 +35,7 @@ public class Status {
         return user;
     }
 
-    public void setUser(Integer user) {
+    public void setUser(final Integer user) {
         this.user = user;
     }
 }

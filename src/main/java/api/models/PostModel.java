@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Timestamp;
 
-public class Post {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
-    private Timestamp created;
+public class PostModel {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
+
+    private Timestamp created;
     private Integer thread;
     private String forum;
     private Boolean isEdited;
@@ -21,7 +22,7 @@ public class Post {
         return created;
     }
 
-    public void setCreated(Timestamp created) {
+    public void setCreated(final Timestamp created) {
         this.created = created;
     }
 
@@ -29,7 +30,7 @@ public class Post {
         return thread;
     }
 
-    public void setThread(Integer thread) {
+    public void setThread(final Integer thread) {
         this.thread = thread;
     }
 
@@ -37,7 +38,7 @@ public class Post {
         return forum;
     }
 
-    public void setForum(String forum) {
+    public void setForum(final String forum) {
         this.forum = forum;
     }
 
@@ -45,7 +46,7 @@ public class Post {
         return isEdited;
     }
 
-    public void setIsEdited(Boolean edited) {
+    public void setIsEdited(final Boolean edited) {
         isEdited = edited;
     }
 
@@ -53,7 +54,7 @@ public class Post {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         this.message = message;
     }
 
@@ -61,7 +62,7 @@ public class Post {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(final String author) {
         this.author = author;
     }
 
@@ -69,7 +70,7 @@ public class Post {
         return parent == null ? 0 : parent;
     }
 
-    public void setParent(Integer parent) {
+    public void setParent(final Integer parent) {
         this.parent = parent;
     }
 
@@ -77,7 +78,7 @@ public class Post {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 }

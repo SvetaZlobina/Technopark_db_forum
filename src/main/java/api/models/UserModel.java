@@ -3,7 +3,8 @@ package api.models;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class User {
+public class UserModel {
+
     private Integer id;
     private String email;
     private String about;
@@ -14,7 +15,7 @@ public class User {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
@@ -22,7 +23,7 @@ public class User {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -30,7 +31,7 @@ public class User {
         return about;
     }
 
-    public void setAbout(String about) {
+    public void setAbout(final String about) {
         this.about = about;
     }
 
@@ -38,7 +39,7 @@ public class User {
         return fullname;
     }
 
-    public void setFullname(String fullname) {
+    public void setFullname(final String fullname) {
         this.fullname = fullname;
     }
 
@@ -46,7 +47,7 @@ public class User {
         return nickname;
     }
 
-    public void setNickname(String nickname) {
+    public void setNickname(final String nickname) {
         this.nickname = nickname;
     }
 

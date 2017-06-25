@@ -1,7 +1,7 @@
 package api.models;
 
 
-public class PostUpdate {
+public class PostUpdateModel {
     private String message;
 
     public String getMessage() {

@@ -1,15 +1,15 @@
 package api.controllers;
 
 
+import api.models.ThreadModel;
+import api.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.bind.annotation.*;
-import api.daoFiles.ForumDAO;
-import api.models.Forum;
-import api.models.Thread;
-import api.daoFiles.ThreadDAO;
-import api.models.User;
-import api.daoFiles.UserDAO;
+import api.daoFiles.DaoForum;
+import api.models.ForumModel;
+import api.daoFiles.DaoThread;
+import api.daoFiles.DaoUser;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -19,25 +19,25 @@ import java.util.logging.Logger;
 @RequestMapping(path = "api/forum")
 public class ForumController {
     @Autowired
-    private UserDAO userDAO;
+    private DaoUser daoUser;
 
     @Autowired
-    private ForumDAO forumDAO;
+    private DaoForum daoForum;
 
     @Autowired
-    private ThreadDAO threadDAO;
+    private DaoThread daoThread;
 
     private static final Logger log = Logger.getLogger(ForumController.class.getName());
 
     @GetMapping(path = "/{slug}/users")
-    public List<User> getUserList(@PathVariable final String slug,
-                                  @RequestParam(value = "limit", defaultValue = "0") final Integer limit,
-                                  @RequestParam(value = "desc", defaultValue = "false") final Boolean desc,
-                                  @RequestParam(value = "since", defaultValue = "") final String since,
-                                  final HttpServletResponse response) {
+    public List<UserModel> getUserList(@PathVariable final String slug,
+                                       @RequestParam(value = "limit", defaultValue = "0") final Integer limit,
+                                       @RequestParam(value = "desc", defaultValue = "false") final Boolean desc,
+                                       @RequestParam(value = "since", defaultValue = "") final String since,
+                                       final HttpServletResponse response) {
         String dbSlug;
         try {
-            dbSlug = forumDAO.getDBForumSlug(slug);
+            dbSlug = daoForum.getDBForumSlug(slug);
         } catch (DataAccessException err) {
             //log.info("DataAccessException: " + err);
 
@@ -45,32 +45,32 @@ public class ForumController {
             return null;
         }
 
-        return forumDAO.getForumUsers(dbSlug, limit, desc, since);
+        return daoForum.getForumUsers(dbSlug, limit, desc, since);
     }
 
     @PostMapping(path = "/{slug}/create")
-    public Thread createThread(@PathVariable("slug") final String forumSlug,
-                               @RequestBody final Thread thread,
-                                final HttpServletResponse response)
+    public ThreadModel createThread(@PathVariable("slug") final String forumSlug,
+                                    @RequestBody final ThreadModel threadModel,
+                                    final HttpServletResponse response)
             throws IllegalAccessException {
-        User oldUser;
-        Forum oldForum;
+        UserModel oldUserModel;
+        ForumModel oldForumModel;
         try {
-            oldUser = userDAO.getUser(thread.getAuthor());
-            oldForum = forumDAO.readForum(forumSlug);
+            oldUserModel = daoUser.getUser(threadModel.getAuthor());
+            oldForumModel = daoForum.readForum(forumSlug);
         } catch (DataAccessException e) {
 
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
         }
-        thread.setForum(oldForum.getSlug());
-        thread.setAuthor(oldUser.getNickname());
+        threadModel.setForum(oldForumModel.getSlug());
+        threadModel.setAuthor(oldUserModel.getNickname());
 
-        if (thread.getSlug() != null) {
+        if (threadModel.getSlug() != null) {
             try {
-                final Thread dbThread = threadDAO.getThreadBySlug(thread.getSlug());
+                final ThreadModel dbThreadModel = daoThread.getThreadBySlug(threadModel.getSlug());
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                return dbThread;
+                return dbThreadModel;
 
             } catch (DataAccessException e) {
                 //TODO: show Exception somehow
@@ -79,23 +79,23 @@ public class ForumController {
 
         response.setStatus(HttpServletResponse.SC_CREATED);
 
-        Thread resultSet = threadDAO.create(thread);
-        forumDAO.incrementThreadCount(oldForum.getSlug());
-        forumDAO.addSingleUser(oldForum.getSlug(), oldUser.getNickname());
+        ThreadModel resultSet = daoThread.create(threadModel);
+        daoForum.incrementThreadCount(oldForumModel.getSlug());
+        daoForum.addSingleUser(oldForumModel.getSlug(), oldUserModel.getNickname());
 
         return resultSet;
     }
 
 
     @GetMapping(path = "/{slug}/threads")
-    public List<Thread> getThreadList(@PathVariable("slug") final String forumSlug,
-                                      @RequestParam(value = "limit", defaultValue = "0") final Integer limit,
-                                      @RequestParam(value = "desc", defaultValue = "false") final Boolean desc,
-                                      @RequestParam(value = "since", defaultValue = "") final String since,
-                                      final HttpServletResponse response) {
+    public List<ThreadModel> getThreadList(@PathVariable("slug") final String forumSlug,
+                                           @RequestParam(value = "limit", defaultValue = "0") final Integer limit,
+                                           @RequestParam(value = "desc", defaultValue = "false") final Boolean desc,
+                                           @RequestParam(value = "since", defaultValue = "") final String since,
+                                           final HttpServletResponse response) {
         String dbSlug;
         try {
-            dbSlug = forumDAO.getDBForumSlug(forumSlug);
+            dbSlug = daoForum.getDBForumSlug(forumSlug);
         } catch (DataAccessException err) {
             //log.info("DataAccessException: " + err);
 
@@ -103,16 +103,16 @@ public class ForumController {
             return null;
         }
 
-        return threadDAO.getThreadList(dbSlug, limit, desc, since);
+        return daoThread.getThreadList(dbSlug, limit, desc, since);
     }
 
     @GetMapping(path = "/{slug}/details")
-    public Forum getDetails(@PathVariable("slug") final String forumSlug,
-                            final HttpServletResponse response) {
+    public ForumModel getDetails(@PathVariable("slug") final String forumSlug,
+                                 final HttpServletResponse response) {
 
         try {
             response.setStatus(HttpServletResponse.SC_OK);
-            return forumDAO.readForum(forumSlug);
+            return daoForum.readForum(forumSlug);
         } catch (DataAccessException err) {
             //log.info("DataAccessException: " + err);
 
@@ -122,21 +122,21 @@ public class ForumController {
     }
 
     @PostMapping(path = "/create")
-    public Forum create(@RequestBody final Forum forum,
-                        final HttpServletResponse response) {
+    public ForumModel create(@RequestBody final ForumModel forumModel,
+                             final HttpServletResponse response) {
 
         try {
-            final Forum dbForum = forumDAO.readForum(forum.getSlug());
+            final ForumModel dbForumModel = daoForum.readForum(forumModel.getSlug());
             response.setStatus(HttpServletResponse.SC_CONFLICT);
-            return dbForum;
+            return dbForumModel;
 
         } catch (DataAccessException e) {
 
             try {
-                final String userName = userDAO.getDBUserName(forum.getUser());
-                forumDAO.createForum(forum.getTitle(), userName, forum.getSlug());
+                final String userName = daoUser.getDBUserName(forumModel.getUser());
+                daoForum.createForum(forumModel.getTitle(), userName, forumModel.getSlug());
                 response.setStatus(HttpServletResponse.SC_CREATED);
-                return forumDAO.readForum(forum.getSlug());
+                return daoForum.readForum(forumModel.getSlug());
 
             } catch (DataAccessException err) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);

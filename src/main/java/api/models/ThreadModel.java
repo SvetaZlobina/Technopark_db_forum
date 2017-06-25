@@ -6,7 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.sql.Timestamp;
 
 
-public class Thread {
+public class ThreadModel {
+
     private Integer id;
     private String title;
     private String author;
@@ -30,7 +31,7 @@ public class Thread {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
@@ -38,7 +39,7 @@ public class Thread {
         return author;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(final String author) {
         this.author = author;
     }
 
@@ -46,7 +47,7 @@ public class Thread {
         return forum;
     }
 
-    public void setForum(String forum) {
+    public void setForum(final String forum) {
         this.forum = forum;
     }
 
@@ -54,7 +55,7 @@ public class Thread {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         this.message = message;
     }
 
@@ -62,7 +63,7 @@ public class Thread {
         return votes == null ? 0 : votes;
     }
 
-    public void setVotes(int votes) {
+    public void setVotes(final int votes) {
         this.votes = votes;
     }
 
@@ -70,7 +71,7 @@ public class Thread {
         return slug;
     }
 
-    public void setSlug(String slug) {
+    public void setSlug(final String slug) {
         this.slug = slug;
     }
 
@@ -78,7 +79,7 @@ public class Thread {
         return created;
     }
 
-    public void setCreated(Timestamp created) {
+    public void setCreated(final Timestamp created) {
         this.created = created;
     }
 }

@@ -1,7 +1,7 @@
 package api.models;
 
 
-public class ThreadUpdate {
+public class ThreadUpdateModel {
     private String title;
     private String message;
 

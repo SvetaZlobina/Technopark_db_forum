@@ -1,25 +1,25 @@
 package api.mappers;
 
 
+import api.models.ThreadModel;
 import org.springframework.jdbc.core.RowMapper;
-import api.models.Thread;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ThreadMapper implements RowMapper<Thread> {
+public class ThreadMapper implements RowMapper<ThreadModel> {
     @Override
-    public Thread mapRow(ResultSet resultSet, int i) throws SQLException {
-        final Thread thread = new Thread();
-        thread.setTitle(resultSet.getString("title"));
-        thread.setSlug(resultSet.getString("slug"));
-        thread.setAuthor(resultSet.getString("author"));
-        thread.setForum(resultSet.getString("forum"));
-        thread.setMessage(resultSet.getString("message"));
-        thread.setCreated(resultSet.getTimestamp("created"));
-        thread.setId(resultSet.getInt("id"));
-        thread.setVotes(resultSet.getInt("votes"));
+    public ThreadModel mapRow(ResultSet resultSet, int i) throws SQLException {
+        final ThreadModel threadModel = new ThreadModel();
+        threadModel.setTitle(resultSet.getString("title"));
+        threadModel.setSlug(resultSet.getString("slug"));
+        threadModel.setAuthor(resultSet.getString("author"));
+        threadModel.setForum(resultSet.getString("forum"));
+        threadModel.setMessage(resultSet.getString("message"));
+        threadModel.setCreated(resultSet.getTimestamp("created"));
+        threadModel.setId(resultSet.getInt("id"));
+        threadModel.setVotes(resultSet.getInt("votes"));
 
-        return thread;
+        return threadModel;
     }
 }

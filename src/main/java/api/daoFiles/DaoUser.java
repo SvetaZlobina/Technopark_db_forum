@@ -1,12 +1,12 @@
 package api.daoFiles;
 
+import api.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import api.helper.ContainerHelper;
-import api.models.User;
 import api.mappers.UserMapper;
 import api.queries.UserQueryCreator;
 
@@ -15,14 +15,19 @@ import java.util.List;
 
 
 @Repository
-public class UserDAO {
+public class DaoUser {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     private static final UserMapper USER_MAPPER = new UserMapper();
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public int createUser(String nickname, String fullname, String email, String about) {
+    public int createUser(final String nickname,
+                          final String fullname,
+                          final String email,
+                          final String about) {
+
         jdbcTemplate.update(
                 UserQueryCreator.getUserCreationQuery(),
                 nickname,
@@ -38,28 +43,29 @@ public class UserDAO {
         );
     }
 
-    public void updateUser(User user) {
-        final Boolean hasEmail = ContainerHelper.isPresent(user.getEmail());
-        final Boolean hasAbout = ContainerHelper.isPresent(user.getAbout());
-        final Boolean hasFullname = ContainerHelper.isPresent(user.getFullname());
+    public void updateUser(final UserModel userModel) {
+
+        final Boolean hasEmail = ContainerHelper.isPresent(userModel.getEmail());
+        final Boolean hasAbout = ContainerHelper.isPresent(userModel.getAbout());
+        final Boolean hasFullname = ContainerHelper.isPresent(userModel.getFullname());
         final Boolean condition = hasEmail || hasAbout || hasFullname;
 
         if (condition) {
             final List<Object> sqlParameters = new ArrayList<>();
 
             if (hasEmail) {
-                sqlParameters.add(user.getEmail());
+                sqlParameters.add(userModel.getEmail());
             }
 
             if (hasAbout) {
-                sqlParameters.add(user.getAbout());
+                sqlParameters.add(userModel.getAbout());
             }
 
             if (hasFullname) {
-                sqlParameters.add(user.getFullname());
+                sqlParameters.add(userModel.getFullname());
             }
 
-            sqlParameters.add(user.getNickname());
+            sqlParameters.add(userModel.getNickname());
 
             jdbcTemplate.update(
                     UserQueryCreator.getUserUpdateQuery(hasEmail, hasAbout, hasFullname),
@@ -68,7 +74,8 @@ public class UserDAO {
         }
     }
 
-    public User getUser(String userName) {
+    public UserModel getUser(final String userName) {
+
         return jdbcTemplate.queryForObject(
                 UserQueryCreator.getUserByNicknameQuery(),
                 new Object[]{userName},
@@ -76,7 +83,9 @@ public class UserDAO {
         );
     }
 
-    public List<User> getUserList(String userName, String email) {
+    public List<UserModel> getUserList(final String userName,
+                                       final String email) {
+
         return jdbcTemplate.query(
                 UserQueryCreator.getUserByNicknameOrEmailQuery(),
                 new Object[]{userName, email},
@@ -84,7 +93,8 @@ public class UserDAO {
         );
     }
 
-    public Integer getUserId(String userName) {
+    public Integer getUserId(final String userName) {
+
         return jdbcTemplate.queryForObject(
                 UserQueryCreator.getIdByNicknameQuery(),
                 new Object[]{userName},
@@ -92,7 +102,8 @@ public class UserDAO {
         );
     }
 
-    public String getDBUserName(String userName) {
+    public String getDBUserName(final String userName) {
+
         return jdbcTemplate.queryForObject(
                 UserQueryCreator.getDBNameQuery(),
                 new Object[]{userName},
@@ -100,7 +111,8 @@ public class UserDAO {
         );
     }
 
-    public boolean checkUsersPresence(List<String> userNameList) {
+    public boolean checkUsersPresence(final List<String> userNameList) {
+
         final Object[] parameters = userNameList.stream().distinct().toArray();
 
         final int userCount = jdbcTemplate.queryForObject(

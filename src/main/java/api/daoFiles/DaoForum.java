@@ -6,22 +6,25 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import api.mappers.UserMapper;
-import api.models.Forum;
+import api.models.ForumModel;
 import api.mappers.ForumMapper;
-import api.models.User;
+import api.models.UserModel;
 import api.queries.ForumQueryCreator;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ForumDAO {
+public class DaoForum {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     private static final UserMapper USER_MAPPER = new UserMapper();
     private static final ForumMapper FORUM_MAPPER = new ForumMapper();
 
-    public void addSingleUser(final String forumSlug, final String userName) {
+    public void addSingleUser(final String forumSlug,
+                              final String userName) {
         jdbcTemplate.update(
                 ForumQueryCreator.getUserAdditionQuery(),
                 forumSlug,
@@ -29,7 +32,9 @@ public class ForumDAO {
         );
     }
 
-    public void addUserBatch(final String forumSlug, final List<String> userNameList) {
+    public void addUserBatch(final String forumSlug,
+                             final List<String> userNameList) {
+
         final List<Object[]> sqlArguments = new ArrayList<>();
         for (int i = 0; i != userNameList.size(); ++i) {
             sqlArguments.add(new Object[]{forumSlug, userNameList.get(i)});
@@ -41,7 +46,10 @@ public class ForumDAO {
         );
     }
 
-    public List<User> getForumUsers(final String forumSlug, final Integer limit, final Boolean desc, final String since) {
+    public List<UserModel> getForumUsers(final String forumSlug,
+                                         final Integer limit, final Boolean desc,
+                                         final String since) {
+
         final ArrayList<Object> sqlArguments = new ArrayList<>();
         sqlArguments.add(forumSlug);
 
@@ -62,6 +70,7 @@ public class ForumDAO {
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void incrementThreadCount(final String forumSlug) {
+
         jdbcTemplate.update(
                 ForumQueryCreator.getThreadIncrementQuery(),
                 forumSlug
@@ -69,7 +78,9 @@ public class ForumDAO {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void increasePostCount(final String forumSlug, final Integer postsToIncrease) {
+    public void increasePostCount(final String forumSlug,
+                                  final Integer postsToIncrease) {
+
         jdbcTemplate.update(
                 ForumQueryCreator.getPostIncreaseQuery(),
                 postsToIncrease,
@@ -77,7 +88,8 @@ public class ForumDAO {
         );
     }
 
-    public Forum readForum(final String forumSlug) {
+    public ForumModel readForum(final String forumSlug) {
+
         return jdbcTemplate.queryForObject(
                 ForumQueryCreator.getForumExtractionQuery(),
                 new Object[]{forumSlug},
@@ -86,6 +98,7 @@ public class ForumDAO {
     }
 
     public String getDBForumSlug(final String forumSlug) {
+
         return jdbcTemplate.queryForObject(
                 ForumQueryCreator.getDBForumSlugQuery(),
                 new Object[]{forumSlug},
@@ -94,7 +107,10 @@ public class ForumDAO {
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void createForum(final String forumTitle, final String userName, final String forumSlug) {
+    public void createForum(final String forumTitle,
+                            final String userName,
+                            final String forumSlug) {
+
         jdbcTemplate.update(
                 ForumQueryCreator.getForumCreationQuery(),
                 forumTitle,

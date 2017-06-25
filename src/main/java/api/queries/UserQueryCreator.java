@@ -7,28 +7,28 @@ import java.util.List;
 
 public class UserQueryCreator {
     public static String getUserCreationQuery() {
-        return "INSERT into \"User\" (nickname, fullname, about, email) values (?, ?, ?, ?)";
+        return "INSERT into \"user\" (nickname, fullname, about, email) values (?, ?, ?, ?)";
     }
 
     public static String getIdByNicknameQuery() {
-        return "SELECT id FROM \"User\" WHERE nickname = ?::citext";
+        return "SELECT id FROM \"user\" WHERE nickname = ?::citext";
     }
 
     public static String getCountUsersQuery(int userCount) {
-        return "SELECT COUNT(*) FROM \"User\" WHERE nickname in (" +
+        return "SELECT COUNT(*) FROM \"user\" WHERE nickname in (" +
                 String.join(", ", Collections.nCopies(userCount, "?")) + " )";
     }
 
     public static String getDBNameQuery() {
-        return "SELECT nickname FROM \"User\" WHERE nickname = ?::citext";
+        return "SELECT nickname FROM \"user\" WHERE nickname = ?::citext";
     }
 
     public static String getUserByNicknameQuery() {
-        return "SELECT * FROM \"User\" WHERE nickname = ?::citext";
+        return "SELECT * FROM \"user\" WHERE nickname = ?::citext";
     }
 
     public static String getUserByNicknameOrEmailQuery() {
-        return "SELECT * FROM \"User\" WHERE nickname = ?::citext OR email = ?::citext";
+        return "SELECT * FROM \"user\" WHERE nickname = ?::citext OR email = ?::citext";
     }
 
     public static String getUserUpdateQuery(boolean hasEmail, boolean hasAbout, boolean hasFullname) {
@@ -47,6 +47,6 @@ public class UserQueryCreator {
             updateArray.add("fullname = ? ");
         }
 
-        return "UPDATE \"User\" SET " + String.join(", ", updateArray) + " WHERE nickname = ?::citext; ";
+        return "UPDATE \"user\" SET " + String.join(", ", updateArray) + " WHERE nickname = ?::citext; ";
     }
 }

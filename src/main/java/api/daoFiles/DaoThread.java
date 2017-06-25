@@ -1,7 +1,7 @@
 package api.daoFiles;
 
 
-
+import api.models.ThreadModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,10 +9,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import api.helper.ContainerHelper;
-import api.models.Thread;
 import api.mappers.ThreadMapper;
-import api.models.ThreadUpdate;
-import api.models.Vote;
+import api.models.ThreadUpdateModel;
+import api.models.VoteModel;
 import api.queries.ThreadQueryCreator;
 
 import java.util.ArrayList;
@@ -20,24 +19,27 @@ import java.util.List;
 
 
 @Repository
-public class ThreadDAO {
+public class DaoThread {
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     private static final ThreadMapper THREAD_MAPPER = new ThreadMapper();
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public Thread create(Thread thread) throws DataAccessException, IllegalAccessException {
+    public ThreadModel create(final ThreadModel threadModel)
+            throws DataAccessException, IllegalAccessException {
+
         Integer lastId = jdbcTemplate.queryForObject(ThreadQueryCreator.getLastIdQuery(), Integer.class);
         lastId = lastId == null ? 0 : lastId;
 
-        final Object[] sqlParameters = new Object[] {
-                thread.getTitle(),
-                thread.getAuthor(),
-                thread.getForum(),
-                thread.getMessage(),
-                thread.getVotes(),
-                thread.getSlug(),
-                thread.getCreated()
+        final Object[] sqlParameters = new Object[]{
+                threadModel.getTitle(),
+                threadModel.getAuthor(),
+                threadModel.getForum(),
+                threadModel.getMessage(),
+                threadModel.getVotes(),
+                threadModel.getSlug(),
+                threadModel.getCreated()
         };
         jdbcTemplate.update(ThreadQueryCreator.getThreadCreationQuery(), sqlParameters);
 
@@ -49,15 +51,17 @@ public class ThreadDAO {
     }
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public void updateThread(Integer threadId, ThreadUpdate threadUpdate) throws DataAccessException {
+    public void updateThread(final Integer threadId,
+                             final ThreadUpdateModel threadUpdateModel) throws DataAccessException {
+
         final ArrayList<Object> queryParameters = new ArrayList<>();
 
-        final String threadTitle = threadUpdate.getTitle();
+        final String threadTitle = threadUpdateModel.getTitle();
         if (ContainerHelper.isPresent(threadTitle)) {
             queryParameters.add(threadTitle);
         }
 
-        final String threadMessage = threadUpdate.getMessage();
+        final String threadMessage = threadUpdateModel.getMessage();
         if (ContainerHelper.isPresent(threadMessage)) {
             queryParameters.add(threadMessage);
         }
@@ -74,7 +78,8 @@ public class ThreadDAO {
     }
 
     // Do not delete. This method is called by name
-    public Integer getIdById(Integer id) {
+    public Integer getIdById(final Integer id) {
+
         return jdbcTemplate.queryForObject(
                 ThreadQueryCreator.getIdByIdQuery(),
                 new Object[]{id},
@@ -83,7 +88,8 @@ public class ThreadDAO {
     }
 
     // Do not delete. This method is called by name
-    public Integer getIdBySlug(String slug) {
+    public Integer getIdBySlug(final String slug) {
+
         return jdbcTemplate.queryForObject(
                 ThreadQueryCreator.getIdBySlugQuery(),
                 new Object[]{slug},
@@ -91,7 +97,11 @@ public class ThreadDAO {
         );
     }
 
-    public List<Thread> getThreadList(String forumSlug, Integer limit, Boolean desc, String since) {
+    public List<ThreadModel> getThreadList(final String forumSlug,
+                                           final Integer limit,
+                                           final Boolean desc,
+                                           final String since) {
+
         final ArrayList<Object> sqlData = new ArrayList<>();
         sqlData.add(forumSlug);
 
@@ -106,7 +116,8 @@ public class ThreadDAO {
         );
     }
 
-    public Thread getThreadBySlug(String threadSlug) throws DataAccessException {
+    public ThreadModel getThreadBySlug(final String threadSlug) throws DataAccessException {
+
         return jdbcTemplate.queryForObject(
                 ThreadQueryCreator.getThreadBySlugQuery(),
                 new Object[]{threadSlug},
@@ -114,7 +125,8 @@ public class ThreadDAO {
         );
     }
 
-    public Thread getThreadById(Integer id) throws DataAccessException {
+    public ThreadModel getThreadById(final Integer id) throws DataAccessException {
+
         return jdbcTemplate.queryForObject(
                 ThreadQueryCreator.getThreadByIdQuery(),
                 new Object[]{id},
@@ -122,14 +134,17 @@ public class ThreadDAO {
         );
     }
 
-    public void voteThread(Integer threadId, Integer userId, Vote.VoteStatus voteStatus) {
-        final Integer threadVoteStatus = getThreadVoteStatus(threadId, userId);
+    public void voteThread(final Integer threadId,
+                           final Integer userId,
+                           final VoteModel.VoteState voteState) {
+
+        Integer threadVoteState = getThreadVoteState(threadId, userId);
 
         final String query;
-        if (voteStatus == Vote.VoteStatus.VOTE && !threadVoteStatus.equals(1)) {
-            query = ThreadQueryCreator.getVoteQuery(threadVoteStatus);
-        } else if (voteStatus == Vote.VoteStatus.UNVOTE && !threadVoteStatus.equals(-1)) {
-            query = ThreadQueryCreator.getUnvoteQuery(threadVoteStatus);
+        if (voteState == VoteModel.VoteState.VOTE && !threadVoteState.equals(1)) {
+            query = ThreadQueryCreator.getVoteQuery(threadVoteState);
+        } else if (voteState == VoteModel.VoteState.UNVOTE && !threadVoteState.equals(-1)) {
+            query = ThreadQueryCreator.getUnvoteQuery(threadVoteState);
         } else {
             return;
         }
@@ -142,14 +157,17 @@ public class ThreadDAO {
         );
     }
 
-    public Integer getThreadVoteStatus(Integer threadId, Integer userId) {
+    public Integer getThreadVoteState(final Integer threadId,
+                                       final Integer userId) {
+
         try {
             return jdbcTemplate.queryForObject(
-                    ThreadQueryCreator.getVoteStatusQuery(),
+                    ThreadQueryCreator.getVoteStateQuery(),
                     new Object[]{threadId, userId},
                     Integer.class
             );
         } catch (DataAccessException e) {
+
             return 0;
         }
     }

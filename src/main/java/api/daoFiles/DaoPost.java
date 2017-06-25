@@ -1,40 +1,42 @@
 package api.daoFiles;
 
+import api.models.PostModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import api.helper.ContainerHelper;
-import api.models.Post;
 import api.mappers.PostMapper;
-import api.models.PostUpdate;
+import api.models.PostUpdateModel;
 import api.queries.PostQueryCreator;
 
 import java.util.*;
 
 @Repository
-public class PostDAO {
+public class DaoPost {
+
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
     private static final PostMapper POST_MAPPER = new PostMapper();
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public List<Integer> createPosts(List<Post> posts) {
+    public List<Integer> createPosts(final List<PostModel> postModels) {
         final int maxId = getMaxPostId();
 
         final List<Object[]> sqlData = new ArrayList<>();
-        for (int i = 0; i != posts.size(); ++i) {
+        for (int i = 0; i != postModels.size(); ++i) {
             sqlData.add(new Object[]{
-                    posts.get(i).getThread(),
-                    posts.get(i).getParent(),
-                    posts.get(i).getAuthor(),
-                    posts.get(i).getMessage(),
-                    posts.get(i).getForum(),
-                    posts.get(i).getThread(),
-                    posts.get(i).getCreated(),
-                    posts.get(i).getParent(),
-                    posts.get(i).getParent()
+                    postModels.get(i).getThread(),
+                    postModels.get(i).getParent(),
+                    postModels.get(i).getAuthor(),
+                    postModels.get(i).getMessage(),
+                    postModels.get(i).getForum(),
+                    postModels.get(i).getThread(),
+                    postModels.get(i).getCreated(),
+                    postModels.get(i).getParent(),
+                    postModels.get(i).getParent()
             });
         }
 
@@ -44,7 +46,9 @@ public class PostDAO {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void updatePost(Integer postId, PostUpdate update) {
+    public void updatePost(final Integer postId,
+                           final PostUpdateModel update) {
+
         final String newMessage = update.getMessage();
         if (!ContainerHelper.isPresent(newMessage)) {
             return;
@@ -57,7 +61,8 @@ public class PostDAO {
         );
     }
 
-    public List<Integer> getPostIdListAfterId(Integer lastId) {
+    public List<Integer> getPostIdListAfterId(final Integer lastId) {
+
         return jdbcTemplate.queryForList(
                 PostQueryCreator.getPostIdsAfterIdQuery(),
                 new Object[]{lastId},
@@ -65,7 +70,8 @@ public class PostDAO {
         );
     }
 
-    public Post extractPostById(Integer postId) {
+    public PostModel extractPostById(final Integer postId) {
+
         return jdbcTemplate.queryForObject(
                 PostQueryCreator.getPostByIdQuery(),
                 new Object[]{postId},
@@ -74,6 +80,7 @@ public class PostDAO {
     }
 
     public Integer getMaxPostId() {
+
         final Integer id = jdbcTemplate.queryForObject(
                 PostQueryCreator.getMaxIdQuery(),
                 Integer.class
@@ -86,7 +93,12 @@ public class PostDAO {
         }
     }
 
-    public List<Post> getPostList(Integer threadId, Integer limit, Boolean desc, String sort, Integer offset) {
+    public List<PostModel> getPostList(final Integer threadId,
+                                       final Integer limit,
+                                       final Boolean desc,
+                                       final String sort,
+                                       final Integer offset) {
+
         if (sort.equals("flat")) {
             return getPostsSortFlat(threadId, limit, desc, offset);
         } else if (sort.equals("tree")) {
@@ -96,13 +108,16 @@ public class PostDAO {
         }
     }
 
-    public Integer getNewPostOffset(Integer currOffset, String sortName, List<Post> postList) {
+    public Integer getNewPostOffset(final Integer currOffset,
+                                    final String sortName,
+                                    final List<PostModel> postModelList) {
+
         if (sortName.equals("flat") || sortName.equals("tree")) {
-            return currOffset + postList.size();
+            return currOffset + postModelList.size();
         } else {
             Integer newOffset = currOffset;
-            for (int i = 0; i != postList.size(); ++ i) {
-                final Integer parentId = postList.get(i).getParent();
+            for (int i = 0; i != postModelList.size(); ++i) {
+                final Integer parentId = postModelList.get(i).getParent();
                 if (parentId == null || parentId.equals(0)) {
                     ++newOffset;
                 }
@@ -111,7 +126,9 @@ public class PostDAO {
         }
     }
 
-    public boolean checkPostsPresence(List<Integer> postIdList, Integer threadId) {
+    public boolean checkPostsPresence(final List<Integer> postIdList,
+                                      final Integer threadId) {
+
         final List<Object> queryParameters = new ArrayList<>();
         queryParameters.add(threadId);
         queryParameters.addAll(postIdList);
@@ -124,7 +141,11 @@ public class PostDAO {
         return postNum.equals(postIdList.size());
     }
 
-    private List<Post> getPostsSortFlat(Integer threadId, Integer limit, Boolean desc, Integer offset) {
+    private List<PostModel> getPostsSortFlat(final Integer threadId,
+                                             final Integer limit,
+                                             final Boolean desc,
+                                             final Integer offset) {
+
         final ArrayList<Object> sqlData = new ArrayList<>();
         sqlData.add(threadId);
 
@@ -143,7 +164,11 @@ public class PostDAO {
         );
     }
 
-    private List<Post> getPostsSortTree(Integer threadId, Integer limit, Boolean desc, Integer offset) {
+    private List<PostModel> getPostsSortTree(final Integer threadId,
+                                             final Integer limit,
+                                             final Boolean desc,
+                                             final Integer offset) {
+
         final ArrayList<Object> sqlData = new ArrayList<>();
         sqlData.add(threadId);
 
@@ -162,7 +187,11 @@ public class PostDAO {
         );
     }
 
-    private List<Post> getPostsSortParentTree(Integer threadId, Integer limit, Boolean desc, Integer offset) {
+    private List<PostModel> getPostsSortParentTree(final Integer threadId,
+                                                   final Integer limit,
+                                                   final Boolean desc,
+                                                   final Integer offset) {
+
         final ArrayList<Object> sqlParameters = new ArrayList<>();
         sqlParameters.add(threadId);
 
